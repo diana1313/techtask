@@ -5,13 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -36,11 +31,11 @@ public class Customer implements Serializable {
 
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
-    private Long created;
+    private Instant created;
 
     @Column(nullable = false)
     @UpdateTimestamp
-    private Long updated;
+    private Instant updated;
 
     @NotBlank
     @Size(min = 2, max = 50)
@@ -53,11 +48,11 @@ public class Customer implements Serializable {
     @Column(unique = true)
     private String email;
 
-    @Pattern(regexp = "^\\+?\\d{6,14}$")
-    @Column(nullable = true) //what does this nullable mean?
+    @Pattern(regexp = "\\+\\d{6,14}")
+    @Column(nullable = true)
     private String phone;
 
-    @Column(name = "is_active", nullable = false) //what is the difference between nullable = false and @NotBlank
+    @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 }
 

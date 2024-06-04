@@ -1,45 +1,56 @@
 package com.the.raven.tech.task.service;
 
 import com.the.raven.tech.task.domain.Customer;
+import com.the.raven.tech.task.dto.CustomerDto;
 import com.the.raven.tech.task.repo.CustomerRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
-    private static final String ID_NOT_FOUND_MESSAGE = "Customer with given id is not found: ";
-
     private CustomerRepository customerRepository;
 
-    public Customer createCustomer(Customer customer) {
-        return customerRepository.save(customer);
+    public CustomerDto createCustomer(Customer customer) {
+        customerRepository.save(customer);
+        return convertToDTO(customer);
+
     }
 
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+    public List<CustomerDto> getAllCustomers() {
+        return customerRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Customer> getCustomerById(Long id) {
-        return customerRepository.findById(id);
+    public Optional<CustomerDto> getCustomerById(Long id) {
+        return customerRepository.findById(id).map(this::convertToDTO);
     }
 
-    public Customer updateCustomer(Long id, Customer updatedCustomer) {
-        return customerRepository.findById(id).map(customer -> {
-            customer.setFullName(updatedCustomer.getFullName());
-            customer.setPhone(updatedCustomer.getPhone());
-            return customerRepository.save(customer);
-        }).orElseThrow(() -> new RuntimeException(ID_NOT_FOUND_MESSAGE + id));
+    public CustomerDto updateCustomer(Long id, Customer updatedCustomer) {
+        if (customerRepository.updateCustomer(id,
+                updatedCustomer.getFullName(), updatedCustomer.getPhone()) != 0) {
+            return convertToDTO(updatedCustomer);
+        } else {
+            throw new RuntimeException("Customer with given id is not found: " + id);
+        }
     }
 
     public void deleteCustomer(Long id) {
-        customerRepository.findById(id).map(customer -> {
-            customer.setActive(false);
-            return customerRepository.save(customer);
-        }).orElseThrow(() -> new RuntimeException(ID_NOT_FOUND_MESSAGE + id));
+        customerRepository.softDelete(id);
+    }
+
+    private CustomerDto convertToDTO(Customer customer) {
+        return CustomerDto.builder()
+                .id(customer.getId())
+                .fullName(customer.getFullName())
+                .email(customer.getEmail())
+                .phone(customer.getPhone())
+                .build();
     }
 }
+

@@ -1,18 +1,19 @@
 package com.the.raven.tech.task.service;
 
 import com.the.raven.tech.task.domain.Customer;
+import com.the.raven.tech.task.dto.CustomerDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CustomerService {
-    Customer createCustomer(Customer customer);
+    CustomerDto createCustomer(Customer customer);
 
-    Optional<Customer> getCustomerById(Long id);
+    Optional<CustomerDto> getCustomerById(Long id);
 
-    List<Customer> getAllCustomers();
+    List<CustomerDto> getAllCustomers();
 
-    Customer updateCustomer(Long id, Customer customerDetails);
+    CustomerDto updateCustomer(Long id, Customer customerDetails);
 
     void deleteCustomer(Long id);
 }
