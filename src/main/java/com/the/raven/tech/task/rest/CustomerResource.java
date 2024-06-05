@@ -3,9 +3,9 @@ package com.the.raven.tech.task.rest;
 import com.the.raven.tech.task.domain.Customer;
 import com.the.raven.tech.task.dto.CustomerDto;
 import com.the.raven.tech.task.service.CustomerServiceImpl;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class CustomerResource {
     private CustomerServiceImpl customerService;
 
     @PostMapping
-    public CustomerDto createCustomer(@Validated @RequestBody Customer customer) {
+    public CustomerDto createCustomer(@Valid @RequestBody Customer customer) {
         return customerService.createCustomer(customer);
     }
 
@@ -34,7 +34,7 @@ public class CustomerResource {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable("id") Long id, @Validated @RequestBody Customer updatedCustomer) {
+    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable("id") Long id, @Valid @RequestBody Customer updatedCustomer) {
         return ResponseEntity.ok(customerService.updateCustomer(id, updatedCustomer));
     }
 
