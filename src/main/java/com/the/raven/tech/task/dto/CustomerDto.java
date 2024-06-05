@@ -1,6 +1,9 @@
 package com.the.raven.tech.task.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.lang.NonNull;
 
 @Data

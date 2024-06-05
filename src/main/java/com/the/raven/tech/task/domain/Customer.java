@@ -10,15 +10,20 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.*;
 
 import java.io.Serializable;
 import java.time.Instant;
 
 @Entity(name = "Customers")
 @Table(name = "customers")
+@SQLDelete(sql = "UPDATE customers SET is_active = false WHERE id=?")
+@FilterDef(name = "activeCustomers", parameters = @ParamDef(name = "isActive", type = Boolean.class))
+@Filter(name = "activeCustomers", condition = "is_active = :isActive")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -53,6 +58,6 @@ public class Customer implements Serializable {
     private String phone;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    private boolean isActive = Boolean.TRUE;
 }
 

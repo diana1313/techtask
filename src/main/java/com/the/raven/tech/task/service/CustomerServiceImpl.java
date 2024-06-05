@@ -3,7 +3,10 @@ package com.the.raven.tech.task.service;
 import com.the.raven.tech.task.domain.Customer;
 import com.the.raven.tech.task.dto.CustomerDto;
 import com.the.raven.tech.task.repo.CustomerRepository;
+import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
+import org.hibernate.Filter;
+import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
+    private EntityManager entityManager;
 
     public CustomerDto createCustomer(Customer customer) {
         customerRepository.save(customer);
@@ -22,7 +26,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public List<CustomerDto> getAllCustomers() {
-        return customerRepository.findAll().stream()
+        return findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -41,7 +45,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public void deleteCustomer(Long id) {
-        customerRepository.softDelete(id);
+        customerRepository.deleteById(id);
     }
 
     private CustomerDto convertToDTO(Customer customer) {
@@ -51,6 +55,15 @@ public class CustomerServiceImpl implements CustomerService {
                 .email(customer.getEmail())
                 .phone(customer.getPhone())
                 .build();
+    }
+
+    private List<Customer> findAll() {
+        Session session = entityManager.unwrap(Session.class);
+        Filter filter = session.enableFilter("activeCustomers");
+        filter.setParameter("isActive", Boolean.TRUE);
+        List<Customer> customers = customerRepository.findAll();
+        session.disableFilter("deletedProductFilter");
+        return customers;
     }
 }
 
