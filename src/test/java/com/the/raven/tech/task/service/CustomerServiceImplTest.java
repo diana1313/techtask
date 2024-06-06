@@ -49,7 +49,6 @@ class CustomerServiceImplTest {
         customer.setFullName(FULL_NAME);
         customer.setEmail(EMAIL);
         customer.setPhone(PHONE);
-        customer.setId(Long.valueOf(2));
         customerRepository.save(customer);
 
         List<CustomerDto> customers = customerService.getAllCustomers();
@@ -63,7 +62,6 @@ class CustomerServiceImplTest {
         customer.setFullName(FULL_NAME);
         customer.setEmail(EMAIL);
         customer.setPhone(PHONE);
-        customer.setId(Long.valueOf(2));
         customer = customerRepository.save(customer);
 
         Optional<CustomerDto> retrievedCustomer = customerService.getCustomerById(customer.getId());
