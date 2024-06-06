@@ -3,9 +3,6 @@ package com.the.raven.tech.task.service;
 import com.the.raven.tech.task.domain.Customer;
 import com.the.raven.tech.task.dto.CustomerDto;
 import com.the.raven.tech.task.repo.CustomerRepository;
-import com.the.raven.tech.task.service.CustomerService;
-import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -18,8 +15,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-@ComponentScan(basePackages = "com.the.raven.tech.task.service")
 @DataJpaTest
+@ComponentScan(basePackages = "com.the.raven.tech.task.service")
 class CustomerServiceImplTest {
     @Autowired
     private CustomerService customerService;

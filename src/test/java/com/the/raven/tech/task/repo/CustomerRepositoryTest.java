@@ -1,9 +1,6 @@
 package com.the.raven.tech.task.repo;
 
 import com.the.raven.tech.task.domain.Customer;
-import com.the.raven.tech.task.repo.CustomerRepository;
-import lombok.AllArgsConstructor;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
