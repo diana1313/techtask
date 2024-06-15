@@ -1,10 +1,12 @@
 package com.the.raven.tech.task.rest;
 
 import com.the.raven.tech.task.domain.Customer;
-import com.the.raven.tech.task.dto.CustomerDto;
+import com.the.raven.tech.task.dto.CreateCustomerDto;
+import com.the.raven.tech.task.dto.CustomerResponseDto;
+import com.the.raven.tech.task.dto.UpdateCustomerDto;
 import com.the.raven.tech.task.service.CustomerServiceImpl;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,29 +14,29 @@ import java.util.List;
 
 @RestController
 @RequestMapping("customers")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CustomerResource {
-    private CustomerServiceImpl customerService;
+    private final CustomerServiceImpl customerService;
 
     @PostMapping
-    public CustomerDto createCustomer(@Valid @RequestBody Customer customer) {
+    public CustomerResponseDto createCustomer(@Valid @RequestBody CreateCustomerDto customer) {
         return customerService.createCustomer(customer);
     }
 
     @GetMapping
-    public List<CustomerDto> getAllCustomers() {
+    public List<CustomerResponseDto> getAllCustomers() {
         return customerService.getAllCustomers();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CustomerDto> getCustomerById(@PathVariable("id") Long id) {
+    public ResponseEntity<CustomerResponseDto> getCustomerById(@PathVariable("id") Long id) {
         return customerService.getCustomerById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable("id") Long id, @Valid @RequestBody Customer updatedCustomer) {
+    public ResponseEntity<CustomerResponseDto> updateCustomer(@PathVariable("id") Long id, @Valid @RequestBody UpdateCustomerDto updatedCustomer) {
         return ResponseEntity.ok(customerService.updateCustomer(id, updatedCustomer));
     }
 

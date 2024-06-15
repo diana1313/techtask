@@ -10,7 +10,7 @@ import org.springframework.lang.NonNull;
 @Getter
 @Setter
 @Builder
-public class CustomerDto {
+public class CustomerResponseDto {
     @NonNull
     private Long id;
 
