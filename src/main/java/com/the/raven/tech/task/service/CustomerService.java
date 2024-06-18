@@ -1,19 +1,21 @@
 package com.the.raven.tech.task.service;
 
-import com.the.raven.tech.task.domain.Customer;
-import com.the.raven.tech.task.dto.CustomerDto;
+import com.the.raven.tech.task.dto.CreateCustomerDto;
+import com.the.raven.tech.task.dto.CustomerResponseDto;
+import com.the.raven.tech.task.dto.UpdateCustomerDto;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CustomerService {
-    CustomerDto createCustomer(Customer customer);
+    CustomerResponseDto createCustomer(@Valid CreateCustomerDto customer);
 
-    Optional<CustomerDto> getCustomerById(Long id);
+    Optional<CustomerResponseDto> getCustomerById(Long id);
 
-    List<CustomerDto> getAllCustomers();
+    List<CustomerResponseDto> getAllCustomers();
 
-    CustomerDto updateCustomer(Long id, Customer customerDetails);
+    CustomerResponseDto updateCustomer(Long id, @Valid UpdateCustomerDto updatedCustomer);
 
     void deleteCustomer(Long id);
 }

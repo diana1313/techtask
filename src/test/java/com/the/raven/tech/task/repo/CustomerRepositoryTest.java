@@ -17,6 +17,7 @@ public class CustomerRepositoryTest {
     private static final String FULL_NAME = "John Smith";
     private static  final String EMAIL = "smith@example.com";
     private static final String PHONE = "+123456789";
+
     @Autowired
     private CustomerRepository customerRepository;
 
@@ -53,5 +54,37 @@ public class CustomerRepositoryTest {
         List<Customer> deletedCustomer = customerRepository.findAll();
 
         assertFalse(deletedCustomer.get(0).isActive());
+    }
+
+    @Test
+    void findAllActive() {
+        // Given
+        Customer customer1 = new Customer();
+        customer1.setFullName(FULL_NAME);
+        customer1.setEmail(EMAIL);
+        customer1.setPhone(PHONE);
+        customer1.setActive(true);
+        customer1 = customerRepository.save(customer1);
+
+        Customer customer2 = new Customer();
+        customer2.setFullName("Deleted name");
+        customer2.setEmail("deleted@email.com");
+        customer2.setPhone("+88888888");
+        customer2.setActive(false);
+        customer2 = customerRepository.save(customer2);
+
+        // When
+        var result = customerRepository.findAllActive();
+
+        // Then
+        assertFalse(result.isEmpty());
+        assertEquals(result.get(0), customer1);
+        var inactiveOpt = customerRepository.findAll()
+            .stream()
+            .filter(c -> !c.isActive())
+            .findFirst();
+        assertTrue(inactiveOpt.isPresent());
+        var inactive = inactiveOpt.get();
+        assertEquals(customer2, inactive);
     }
 }

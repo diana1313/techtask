@@ -1,112 +1,121 @@
 package com.the.raven.tech.task.service;
 
 import com.the.raven.tech.task.domain.Customer;
-import com.the.raven.tech.task.dto.CustomerDto;
+import com.the.raven.tech.task.dto.CreateCustomerDto;
+import com.the.raven.tech.task.dto.CustomerResponseDto;
+import com.the.raven.tech.task.dto.UpdateCustomerDto;
+import com.the.raven.tech.task.maper.CustomerMapper;
 import com.the.raven.tech.task.repo.CustomerRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.ComponentScan;
-
-
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
-@DataJpaTest
-@ComponentScan(basePackages = "com.the.raven.tech.task.service")
+@ExtendWith(MockitoExtension.class)
 class CustomerServiceImplTest {
-    @Autowired
-    private CustomerService customerService;
-    @Autowired
+
+    @Mock
     private CustomerRepository customerRepository;
+    @Mock
+    private CustomerMapper customerMapper;
 
-    private static final String FULL_NAME = "John Smith";
-    private static final String EMAIL = "smith@example.com";
-    private static final String PHONE = "+123456789";
-
+    @InjectMocks
+    private CustomerServiceImpl customerService;
 
     @Test
     void createCustomer() {
-        Customer customer = new Customer();
-        customer.setFullName(FULL_NAME);
-        customer.setEmail(EMAIL);
-        customer.setPhone(PHONE);
+        // Given
+        var customer = mock(CreateCustomerDto.class);
+        var savedEntity = mock(Customer.class);
+        var response = mock(CustomerResponseDto.class);
+        when(customerMapper.toEntity(customer)).thenReturn(savedEntity);
+        when(customerRepository.save(notNull())).thenReturn(savedEntity);
+        when(customerMapper.toCustomerResponseDto(savedEntity)).thenReturn(response);
 
-        CustomerDto createdCustomer = customerService.createCustomer(customer);
 
+        // When
+        CustomerResponseDto createdCustomer = customerService.createCustomer(customer);
+
+        // Then
         assertNotNull(createdCustomer);
-        assertEquals(FULL_NAME, createdCustomer.getFullName());
-        assertEquals(EMAIL, createdCustomer.getEmail());
-        assertEquals(PHONE, createdCustomer.getPhone());
+        assertSame(response, createdCustomer);
     }
 
     @Test
     void getAllCustomers() {
-        Customer customer = new Customer();
-        customer.setFullName(FULL_NAME);
-        customer.setEmail(EMAIL);
-        customer.setPhone(PHONE);
-        customerRepository.save(customer);
+        // When
+        var customer = mock(Customer.class);
+        when(customerRepository.findAllActive()).thenReturn(List.of(customer));
+        var resultDto = mock(CustomerResponseDto.class);
+        when(customerMapper.toCustomerResponseDto(customer)).thenReturn(resultDto);
 
-        List<CustomerDto> customers = customerService.getAllCustomers();
-        assertNotNull(customers);
-        assertFalse(customers.isEmpty());
+        List<CustomerResponseDto> result = customerService.getAllCustomers();
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertSame(resultDto, result.get(0));
     }
 
     @Test
     void getCustomerById() {
-        Customer customer = new Customer();
-        customer.setFullName(FULL_NAME);
-        customer.setEmail(EMAIL);
-        customer.setPhone(PHONE);
-        customer = customerRepository.save(customer);
+        // Given
+        var id = 22L;
+        var customer = mock(Customer.class);
+        when(customerRepository.findById(id)).thenReturn(Optional.of(customer));
+        var responseDto = mock(CustomerResponseDto.class);
+        when(customerMapper.toCustomerResponseDto(customer)).thenReturn(responseDto);
 
-        Optional<CustomerDto> retrievedCustomer = customerService.getCustomerById(customer.getId());
+        // When
+        Optional<CustomerResponseDto> resultOpt = customerService.getCustomerById(id);
 
-        assertTrue(retrievedCustomer.isPresent());
-        assertEquals(FULL_NAME, retrievedCustomer.get().getFullName());
+        assertTrue(resultOpt.isPresent());
+        var result = resultOpt.get();
+        assertSame(responseDto, result);
     }
 
     @Test
     void updateCustomer() {
-        String uFullName = "Jade Smith";
-        String uPhone = "+429888943";
-        Customer customer = new Customer();
-        customer.setFullName(FULL_NAME);
-        customer.setEmail(EMAIL);
-        customer.setPhone(PHONE);
-        customer = customerRepository.save(customer);
+        // Given
+        var id = 23L;
+        var updatedName = "John Smith";
+        var updatedPhone = "+000000000";
+        var dto = new UpdateCustomerDto(updatedName, updatedPhone);
+        var customer = mock(Customer.class);
+        when(customerRepository.updateCustomer(id, updatedName, updatedPhone)).thenReturn(customer);
+        var responseDto = mock(CustomerResponseDto.class);
+        when(customerMapper.toCustomerResponseDto(customer)).thenReturn(responseDto);
 
-        Customer uCustomer = new Customer();
-        uCustomer.setFullName(uFullName);
-        uCustomer.setPhone(uPhone);
-        uCustomer.setEmail(EMAIL);
-        uCustomer.setId(customer.getId());
+        // When
+        var result = customerService.updateCustomer(id, dto);
 
-        CustomerDto updatedCustomer = customerService.updateCustomer(uCustomer.getId(), uCustomer);
-
-        assertNotNull(updatedCustomer);
-        assertEquals(uFullName, updatedCustomer.getFullName());
-        assertEquals(EMAIL, updatedCustomer.getEmail());
-        assertEquals(uPhone, updatedCustomer.getPhone());
+        // Then
+        assertSame(responseDto, result);
     }
 
-   @Test
+    @Test
     void deleteCustomer() {
-        Customer customer = new Customer();
-        customer.setFullName(FULL_NAME);
-        customer.setEmail(EMAIL);
-        customer.setPhone(PHONE);
-        customer = customerRepository.save(customer);
+        // Given
+       var id = 102L;
 
-        customerService.deleteCustomer(customer.getId());
+        // When
+       customerService.deleteCustomer(id);
 
-        List<Customer> deletedCustomer = customerRepository.findAll();
-
-        assertFalse(deletedCustomer.get(0).isActive());
+       // Then
+       verify(customerRepository).deleteById(id);
     }
 }
 
